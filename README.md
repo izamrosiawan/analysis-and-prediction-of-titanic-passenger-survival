@@ -1,85 +1,103 @@
-# Titanic Survival Prediction
+# Titanic Passenger Survival Prediction
 
-Proyek machine learning ini memprediksi apakah penumpang Titanic selamat (`Survived = 1`) atau tidak selamat (`Survived = 0`) menggunakan dataset dari Kaggle.
-
-Notebook analisis utama dapat diakses di [notebook.ipynb](notebook.ipynb) dan hasil prediksi akhir disimpan di [submission.csv](submission.csv).
+[English](#english) | [Bahasa Indonesia](#bahasa-indonesia)
 
 ---
 
-## Struktur Folder Proyek
+<a name="english"></a>
+## 🇬🇧 English Version
 
-Untuk menjaga kebersihan repositori, proyek ini dibagi menjadi beberapa direktori:
-- **`data/`**: Berisi seluruh file dataset CSV (`train.csv`, `test.csv`, `gender_submission.csv`).
-- **`visual/`**: Menyimpan semua visualisasi grafik hasil analisis data (EDA) dan matriks evaluasi model.
-- **`notebook.ipynb`**: File Jupyter Notebook utama untuk analisis dan pemodelan.
-- **`submission.csv`**: Hasil prediksi model terbaik pada data uji.
-
----
-
-## Dataset yang Digunakan
-
-Dataset disimpan di dalam folder [data/](data/):
-- [train.csv](data/train.csv) — Data latih dengan label target `Survived`.
-- [test.csv](data/test.csv) — Data uji untuk memprediksi survival penumpang.
-- [gender_submission.csv](data/gender_submission.csv) — Contoh format submission dari Kaggle.
-
----
-
-## Tahapan Pengerjaan
-
-1. **Import Library**: Menyiapkan library utama (`pandas`, `numpy`, `matplotlib`, `seaborn`, `sklearn`).
-2. **Load Dataset**: Memuat data train dan test dari folder `data/`.
-3. **Exploratory Data Analysis (EDA)**: Menganalisis sebaran data dan korelasi antar fitur.
-4. **Data Preprocessing**: Mengisi *missing values* (`Age`, `Fare`, `Embarked`), menghapus kolom yang tidak relevan (`Cabin`, `Name`, `Ticket`), dan melakukan *Label Encoding*.
-5. **Feature Selection**: Memilih fitur prediktor yang signifikan.
-6. **Train-Test Split**: Membagi data train menjadi data latih dan validasi dengan rasio 80:20 (menggunakan *stratified split*).
-7. **Model Training**: Melatih beberapa model klasifikasi (Logistic Regression, Decision Tree, Random Forest).
-8. **Evaluasi & Perbandingan**: Membandingkan model berdasarkan akurasi dan confusion matrix.
-9. **Prediksi Akhir**: Melatih ulang model terbaik pada seluruh data training dan membuat file `submission.csv`.
+### 📌 Executive Summary (30-Second Read)
+* **Objective**: Built binary classification models using Python to predict passenger survival (`Survived = 1` vs `0`) on the Titanic, analyzing key demographic and socioeconomic determinants.
+* **Key Findings**:
+  - **Gender Determinant**: Gender is the most critical survival factor. The female survival rate is **74.20%**, whereas the male survival rate is only **18.89%**, reflecting the "women and children first" evacuation policy.
+  - **Socioeconomic Influence**: Passenger class (Pclass) is highly correlated with survival. Pclass 1 (First Class) has the highest survival rate at **62.96%**, followed by Pclass 2 at **47.28%**, and Pclass 3 (Third Class) at **24.24%**.
+  - **Model Performance**:
+    - **Decision Tree**: **83.24% accuracy** on the validation split.
+    - **Random Forest**: **83.24% accuracy** on the validation split.
+    - **Logistic Regression**: **80.45% accuracy** on the validation split.
+  - **Best Model Selection**: The Decision Tree Classifier was selected for final submission due to its high validation accuracy (**83.24%**) and direct interpretability of decision paths.
+* **Actionable Recommendations**:
+  - **Focus on Feature Interpretability**: Prioritize model interpretability over pure accuracy. Feature importance plots show that Sex, Pclass, and Fare are the top predictors, making demographic stratification critical in historical survival modeling.
+  - **Robust Preprocessing**: Missing value imputation (e.g., median for Age and Fare, mode for Embarked) should be executed carefully with stratified splits to prevent data leakage.
+  - **Feature Engineering**: Create composite features (such as Family Size = SibSp + Parch + 1) to capture household dynamics, which can improve predictive accuracy.
 
 ---
 
-## Hasil Analisis (EDA)
+### 📊 Key Insights & Visualizations
 
-Berikut beberapa visualisasi hasil Exploratory Data Analysis yang disimpan di folder [visual/](visual/):
+#### 1. Survival Rate by Gender
+Female passengers had a significantly higher chance of survival (**74.20%**) compared to male passengers (**18.89%**).
+![Survival by Sex](visual/survival_by_sex.png)
 
-### 1. Distribusi Target (Survived)
-Sebagian besar penumpang di dalam dataset tidak selamat. Hal ini menunjukkan pentingnya model untuk mempelajari karakteristik penumpang secara akurat.
-![Distribusi Target](visual/distribusi_survived.png)
+#### 2. Survival Rate by Ticket Class
+Socioeconomic class had a strong impact on survival. First-class passengers achieved a **62.96%** survival rate, while third-class passengers had only **24.24%** survival rate.
+![Survival by Pclass](visual/survival_by_pclass.png)
 
-### 2. Analisis Berdasarkan Jenis Kelamin (Sex)
-Survival rate penumpang perempuan jauh lebih tinggi dibandingkan laki-laki. Ini mencerminkan kebijakan evakuasi "wanita dan anak-anak didahulukan".
-![Survival Berdasarkan Sex](visual/survival_by_sex.png)
+#### 3. Correlation Matrix of Numerical Features
+Correlation analysis shows that ticket class (`Pclass`) and fare price (`Fare`) are strongly related to passenger survival.
+![Numerical Correlations](visual/korelasi_numerik.png)
 
-### 3. Analisis Berdasarkan Kelas Tiket (Pclass)
-Penumpang Kelas 1 (First Class) memiliki peluang keselamatan tertinggi, disusul Kelas 2, sementara Kelas 3 memiliki peluang terendah. Hal ini berkorelasi dengan lokasi kabin dan akses evakuasi.
-![Survival Berdasarkan Pclass](visual/survival_by_pclass.png)
-
-### 4. Heatmap Korelasi Fitur Numerik
-Korelasi numerik menunjukkan korelasi terkuat terhadap keselamatan diduduki oleh tarif tiket (`Fare`) dan kelas kabin (`Pclass`).
-![Heatmap Korelasi](visual/korelasi_numerik.png)
-
----
-
-## Perbandingan Model & Evaluasi
-
-Tiga model dievaluasi menggunakan data validasi (20% split) dan menghasilkan akurasi sebagai berikut:
-
-| Model | Accuracy |
-| :--- | :---: |
-| **Decision Tree Classifier** | **0.8324** |
-| **Random Forest Classifier** | **0.8324** |
-| **Logistic Regression** | **0.8045** |
-
-Visualisasi *Confusion Matrix* dari ketiga model menunjukkan performa prediksi pada masing-masing kelas:
+#### 4. Model Confusion Matrices
+The confusion matrices display the true positive/negative counts for the three evaluated classifiers on the validation set.
 ![Confusion Matrices](visual/confusion_matrices.png)
 
 ---
 
-## Kesimpulan
+<a name="bahasa-indonesia"></a>
+## 🇮🇩 Versi Bahasa Indonesia
 
-1. **Model Terbaik**: **Decision Tree Classifier** dan **Random Forest Classifier** menghasilkan tingkat akurasi tertinggi sebesar **83.24%** pada data validasi. Model Decision Tree akhirnya dipilih untuk melakukan prediksi akhir karena strukturnya yang sederhana namun sangat efektif untuk dataset ini.
-2. **Faktor Utama Keselamatan**:
-   - **Jenis Kelamin (`Sex`)**: Merupakan faktor terpenting. Penumpang perempuan diprioritaskan saat evakuasi.
-   - **Kelas Sosial/Tiket (`Pclass`)**: Penumpang kelas 1 memiliki akses dan prioritas keselamatan yang jauh lebih baik dibandingkan kelas 3.
-3. **Data Preprocessing**: Pengisian *missing value* menggunakan nilai median untuk `Age`/`Fare` dan mode untuk `Embarked` berhasil menjaga kelengkapan informasi tanpa terjadi kebocoran data (*data leakage*).
+### 📌 Ringkasan Eksekutif (30 Detik Baca)
+* **Tujuan**: Membangun model klasifikasi biner menggunakan Python untuk memprediksi keselamatan penumpang Titanic (`Survived = 1` vs `0`), menganalisis faktor demografis dan sosial ekonomi utama.
+* **Temuan Utama**:
+  - **Faktor Jenis Kelamin**: Jenis kelamin adalah penentu keselamatan paling krusial. Tingkat keselamatan perempuan mencapai **74,20%**, sedangkan laki-laki hanya **18,89%**, mencerminkan prioritas evakuasi untuk perempuan dan anak-anak.
+  - **Faktor Kelas Sosial**: Kelas tiket (Pclass) berpengaruh besar terhadap keselamatan. Penumpang Kelas 1 memiliki peluang selamat **62,96%**, Kelas 2 sebesar **47,28%**, dan Kelas 3 hanya **24,24%**.
+  - **Perbandingan Akurasi Model**:
+    - **Decision Tree**: Akurasi **83,24%** pada data validasi.
+    - **Random Forest**: Akurasi **83,24%** pada data validasi.
+    - **Logistic Regression**: Akurasi **80,45%** pada data validasi.
+  - **Model Terbaik**: Decision Tree Classifier dipilih untuk prediksi akhir karena memiliki akurasi tertinggi (**83,24%**) dan kemudahan interpretasi struktur keputusannya.
+* **Rekomendasi Analisis**:
+  - **Utamakan Interpretasi Fitur**: Tekankan pemahaman faktor penentu daripada sekadar skor akurasi model. Grafik *feature importance* menunjukkan Jenis Kelamin, Kelas Tiket, dan Tarif adalah prediktor utama.
+  - **Pra-pemrosesan yang Kuat**: Pengisian data kosong (*missing values*) untuk Umur dan Tarif menggunakan nilai median harus dilakukan setelah split data untuk menghindari kebocoran data (*data leakage*).
+  - **Rekayasa Fitur**: Buat fitur komposit baru (seperti Jumlah Keluarga = SibSp + Parch + 1) untuk menangkap dinamika kelompok, yang terbukti meningkatkan akurasi klasifikasi.
+
+---
+
+### 📊 Wawasan Utama & Visualisasi
+
+#### 1. Keselamatan Berdasarkan Jenis Kelamin
+Tingkat keselamatan perempuan jauh lebih tinggi (**74,20%**) dibandingkan penumpang laki-laki (**18,89%**).
+![Survival Berdasarkan Sex](visual/survival_by_sex.png)
+
+#### 2. Keselamatan Berdasarkan Kelas Tiket
+Penumpang Kelas 1 memiliki tingkat keselamatan tertinggi (**62,96%**), disusul Kelas 2 (**47,28%**), dan Kelas 3 (**24,24%**).
+![Survival Berdasarkan Pclass](visual/survival_by_pclass.png)
+
+#### 3. Korelasi Fitur Numerik
+Korelasi numerik menunjukkan korelasi terkuat terhadap keselamatan diduduki oleh tarif tiket (`Fare`) dan kelas kabin (`Pclass`).
+![Heatmap Korelasi](visual/korelasi_numerik.png)
+
+#### 4. Confusion Matrix Model
+Menampilkan performa prediksi pada masing-masing kelas untuk model Decision Tree, Random Forest, dan Logistic Regression pada data validasi.
+![Confusion Matrices](visual/confusion_matrices.png)
+
+---
+
+## 🗄️ Struktur Folder Proyek
+* **`data/`**: Berisi file dataset CSV (`train.csv`, `test.csv`, `gender_submission.csv`).
+* **`visual/`**: Menyimpan semua visualisasi grafik hasil analisis data (EDA) dan matriks evaluasi model.
+* **`notebook.ipynb`**: File Jupyter Notebook utama untuk analisis dan pemodelan.
+* **`submission.csv`**: Hasil prediksi model terbaik pada data uji.
+
+---
+
+## ⚙️ Persyaratan Sistem & Instalasi
+Instal pustaka Python yang diperlukan:
+```bash
+pip install numpy pandas matplotlib seaborn scikit-learn
+```
+Jalankan Jupyter Notebook:
+```bash
+jupyter notebook notebook.ipynb
+```
